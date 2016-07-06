@@ -8,16 +8,18 @@
 
 /// Prints usage message
 void usage(char* filename) {
-    printf("\tNSA - yet another CIA network installer for FBI 2.0 or greater.\n"
+    printf("\tNSA - yet another CIA network installer for FBI 2.0 or"
+           "greater.\n"
            "\tUsage: %s ip-address 1st.cia [2nd.cia 3rd.cia ...]\n", filename);
-    exit(0);
 }
 
 int main(int argc, char* argv[]) {
 
     // Print usage message if too few args are given.
-    if(argc < 3)
+    if(argc < 3) {
         usage(argv[0]);
+        return EXIT_FAILURE;
+    }
 
     // Check the files first.
     // Keep each file name with its size, which we'll need when sending the
@@ -95,11 +97,12 @@ int main(int argc, char* argv[]) {
         recv(sock, NULL, 1, 0);
 
         // Send the file size as a big endian ulong int
-        printf("DEBUG:: size before %lx", filelist[i].size);
-
-        filelist[i].size = (filelist[i].size & 0x00000000FFFFFFFF) << 32 | (filelist[i].size & 0xFFFFFFFF00000000) >> 32;
-        filelist[i].size = (filelist[i].size & 0x0000FFFF0000FFFF) << 16 | (filelist[i].size & 0xFFFF0000FFFF0000) >> 16;
-        filelist[i].size = (filelist[i].size & 0x00FF00FF00FF00FF) << 8  | (filelist[i].size & 0xFF00FF00FF00FF00) >> 8;
+        filelist[i].size = (filelist[i].size & 0x00000000FFFFFFFF) << 32 |
+            (filelist[i].size & 0xFFFFFFFF00000000) >> 32;
+        filelist[i].size = (filelist[i].size & 0x0000FFFF0000FFFF) << 16 |
+            (filelist[i].size & 0xFFFF0000FFFF0000) >> 16;
+        filelist[i].size = (filelist[i].size & 0x00FF00FF00FF00FF) << 8  |
+            (filelist[i].size & 0xFF00FF00FF00FF00) >> 8;
 
         printf("Sending size of %s...\n", filelist[i].file);
         send(sock, &filelist[i].size, sizeof(unsigned long int), 0);
